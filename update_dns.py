@@ -33,6 +33,7 @@ if options.record_to_update is None:
 if options.verbose:
     logging.basicConfig(
         level=logging.INFO,
+		stream=sys.stdout
     )
 
 
