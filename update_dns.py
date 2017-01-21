@@ -1,5 +1,9 @@
 #! /usr/bin/env python
-"""Updates a Route53 hosted A alias record with the current ip of the system.
+"""
+Updates a Route53 hosted A alias record with the current ip of the system,
+as reported by ipify.org.
+This script is a slight modification of Jacob Sanford's original work:
+  https://github.com/JacobSanford/route-53-dyndns
 """
 import boto.route53
 import logging
@@ -9,16 +13,17 @@ import re
 from re import search
 import socket
 
-__author__ = "Jacob Sanford"
+__author__ = "Jacob Menashe"
 __license__ = "GPL"
-__version__ = "1.0.0"
-__maintainer__ = "Jacob Sanford"
-__email__ = "jacob.josh.sanford@gmail.com"
+__version__ = "1.0.1"
+__maintainer__ = "Jacob Menashe"
+__email__ = "jmenashe@gmail.com"
 __status__ = "Development"
 
 parser = OptionParser()
 parser.add_option('-R', '--record', type='string', dest='record_to_update', help='The A record to update.')
 parser.add_option('-v', '--verbose', dest='verbose', default=False, help='Enable Verbose Output.', action='store_true')
+parser.add_option('-s', '--secure', dest='secure', default=False, help='Use a secure connection to the ip address provider.', action='store_true')
 (options, args) = parser.parse_args()
 
 if options.record_to_update is None:
@@ -33,7 +38,8 @@ if options.verbose:
 
 # use ipify to get ip
 from requests import get
-current_ip = get('https://api.ipify.org').text
+protocol = 'https' if options.secure else 'http'
+current_ip = get('%s://api.ipify.org' % protocol).text
 
 record_to_update = options.record_to_update
 zone_to_update = '.'.join(record_to_update.split('.')[-2:])
