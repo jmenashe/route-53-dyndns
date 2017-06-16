@@ -24,17 +24,21 @@ parser = OptionParser()
 parser.add_option('-R', '--record', type='string', dest='record_to_update', help='The A record to update.')
 parser.add_option('-v', '--verbose', dest='verbose', default=False, help='Enable Verbose Output.', action='store_true')
 parser.add_option('-s', '--secure', dest='secure', default=False, help='Use a secure connection to the ip address provider.', action='store_true')
+parser.add_option('--log', dest='log', default='log.txt', help='Path to the log file for info/debugging.')
 (options, args) = parser.parse_args()
+
+lstream = open('log.txt', 'a')
 
 if options.record_to_update is None:
     logging.error('Please specify an A record with the -R switch.')
     parser.print_help()
     sys.exit(-1)
 if options.verbose:
-    logging.basicConfig(
-        level=logging.INFO,
-		stream=sys.stdout
-    )
+	logging.basicConfig(level=logging.INFO, # use DEBUG for detailed logs from boto
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M',
+                    filename=options.log,
+                    filemode='a')
 
 
 # use ipify to get ip
